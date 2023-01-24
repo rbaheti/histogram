@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8" />
+    <title>Histogram</title>
+    <style>
+      canvas {
+        border: 1px solid #c3c3c3;
+      }
+      .button {
+        background-color: #4CAF50;
+        border: none;
+        color: white;
+        padding: 5px 10px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        border-radius: 5%;
+      }
+    </style>
+  </head>
+  <body align="center">
+    <p><b>Histogram</b></p>
+    <canvas id="histogram" width="300" height="550"></canvas><br/><br/>
+    Enter integers seperated by a comma:
+    <input type="text" name="number" id="num" /><br/><br/>
+    <input type="button" value="Submit" name="Submit" class="button" onclick="onClickSubmit()" />
+
+    <script>
+      function draw(values) {
+        const canvas = document.getElementById("histogram");
+        const ctx = canvas.getContext("2d");
+        ctx.save();
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        let barWidth = 40; //bar width
+        let canvasX = 50; // first bar position
+        let xAxis = 20;
+        let yAxis = 50;
+        const yLabel = 20;
+        const barGap = 15;
+
+        const canvasWidth = values.length * (barWidth+barGap)+100;
+        if(canvasWidth > 400) {
+          canvas.width = canvasWidth
+        }
+        const maxHeight = Math.max(...values)
+        const verticleScalingValue = (canvas.height - yAxis - 40) / maxHeight;
+        let xAxisLine = canvas.width + xAxis;
+
+        // draw x and y axes lines
+        ctx.beginPath();
+        ctx.moveTo(50, 30); // y-axis starting point
+        ctx.lineTo(50, 500);
+        ctx.moveTo(50, 500); // x-axis starting point
+        ctx.lineTo(xAxisLine - 50, 500);
+        ctx.stroke();
+
+        for (let i = 0; i < values.length; i++) {
+          // display Bar
+          ctx.fillStyle = "#3399ff";
+          let h = values[i];
+          const barHeight = h * verticleScalingValue;
+          ctx.fillRect(canvasX + xAxis, canvas.height - barHeight - yAxis, barWidth, barHeight);
+
+          canvasX += barWidth + barGap;
+          /* display Bar number */
+          ctx.fillStyle = "black";
+          ctx.font = "12px sans-serif";
+          ctx.fillText("Bar " + `${i+1}`, canvasX - xAxis, canvas.height - yLabel);
+
+          /* display Bar value */
+          ctx.fillStyle = "black";
+          ctx.font = "12px sans-serif";
+          ctx.fillText(values[i], canvasX - xAxis, canvas.height - yAxis - 10);
+        }
+      }
+
+      // draw default chart when loading first time.
+      draw([10, 20, 60, 80, 30, 15]);
+
+      const onClickSubmit = () => {
+        let nums = document.getElementById("num").value;
+        if(nums.length === 0) return;
+
+        const strValues = nums.split(",");
+        const values = []
+        for(let i = 0; i < strValues.length; ++i) {
+          let value = parseInt(strValues[i]);
+          if(isNaN(value)) {
+            window.alert("Invalid input. Please enter valid integers.")
+            return;
+          }
+          values.push(value)
+        }
+        draw(values);
+        document.getElementById("num").value = ""
+      }
+    </script>
+  </body>
+</html>
